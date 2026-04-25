@@ -1,0 +1,250 @@
+
+<h2 class="sr-only">Fake product review monitoring system with AI analysis, sentiment scoring, and reviewer credibility</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.app{font-family:var(--font-sans);padding:1.5rem 0}
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:12px}
+.title{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.subtitle{font-size:13px;color:var(--color-text-secondary);margin-top:2px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px}
+.metric-label{font-size:12px;color:var(--color-text-secondary);margin-bottom:6px}
+.metric-value{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.metric-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:3px}
+.metric-value.red{color:#E24B4A}
+.metric-value.amber{color:#BA7517}
+.metric-value.green{color:#639922}
+.section-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem}
+.card-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);margin-bottom:12px;text-transform:uppercase;letter-spacing:.04em}
+.filters{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center}
+.filter-btn{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:5px 12px;font-size:12px;cursor:pointer;color:var(--color-text-secondary);transition:all .15s}
+.filter-btn.active{background:var(--color-background-primary);border-color:var(--color-border-primary);color:var(--color-text-primary);font-weight:500}
+.reviews-list{display:flex;flex-direction:column;gap:10px}
+.review-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;background:var(--color-background-primary);position:relative;overflow:hidden}
+.review-card.fake{border-color:#F09595}
+.review-card.suspicious{border-color:#FAC775}
+.review-card.genuine{border-color:#C0DD97}
+.review-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;flex-shrink:0}
+.review-meta{flex:1;min-width:0}
+.reviewer-name{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.review-date{font-size:11px;color:var(--color-text-tertiary)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:500}
+.badge-fake{background:#FCEBEB;color:#A32D2D}
+.badge-suspicious{background:#FAEEDA;color:#854F0B}
+.badge-genuine{background:#EAF3DE;color:#3B6D11}
+.stars{color:#EF9F27;font-size:13px;margin-bottom:6px}
+.review-text{font-size:13px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:10px}
+.signals{display:flex;gap:6px;flex-wrap:wrap}
+.signal{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--color-background-tertiary);color:var(--color-text-secondary)}
+.signal.red{background:#FCEBEB;color:#A32D2D}
+.signal.amber{background:#FAEEDA;color:#854F0B}
+.signal.green{background:#EAF3DE;color:#3B6D11}
+.score-row{display:flex;gap:12px;margin-top:10px;padding-top:10px;border-top:0.5px solid var(--color-border-tertiary)}
+.score-item{text-align:center;flex:1}
+.score-label{font-size:10px;color:var(--color-text-tertiary);margin-bottom:3px}
+.score-val{font-size:14px;font-weight:500}
+.analyze-btn{margin-top:10px;width:100%;padding:7px;font-size:12px;cursor:pointer;border-radius:var(--border-radius-md);background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);color:var(--color-text-primary);transition:all .15s}
+.analyze-btn:hover{background:var(--color-background-primary);border-color:var(--color-border-primary)}
+.analyze-btn:disabled{opacity:.5;cursor:not-allowed}
+.ai-result{margin-top:10px;padding:10px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-label{font-size:12px;color:var(--color-text-secondary);width:70px;flex-shrink:0}
+.bar-track{flex:1;height:7px;background:var(--color-background-tertiary);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.bar-val{font-size:11px;color:var(--color-text-secondary);width:28px;text-align:right;flex-shrink:0}
+.donut-wrap{display:flex;align-items:center;gap:16px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-secondary);margin-bottom:6px}
+.legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+select{font-size:12px;padding:5px 8px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer}
+</style>
+
+<div class="app">
+  <div class="top-bar">
+    <div>
+      <div class="title">Review Intelligence Monitor</div>
+      <div class="subtitle">AI-powered fake review detection &amp; analysis</div>
+    </div>
+    <select id="productFilter" onchange="filterReviews()">
+      <option value="all">All products</option>
+      <option value="headphones">Wireless Headphones X9</option>
+      <option value="blender">NutriBlast Pro Blender</option>
+      <option value="watch">SmartWatch Lite 2</option>
+    </select>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Total reviews</div><div class="metric-value" id="m-total">12</div><div class="metric-sub">across 3 products</div></div>
+    <div class="metric"><div class="metric-label">Flagged as fake</div><div class="metric-value red" id="m-fake">5</div><div class="metric-sub" id="m-fake-pct">41.7% of total</div></div>
+    <div class="metric"><div class="metric-label">Suspicious</div><div class="metric-value amber" id="m-susp">3</div><div class="metric-sub">needs review</div></div>
+    <div class="metric"><div class="metric-label">Avg credibility</div><div class="metric-value amber" id="m-cred">54%</div><div class="metric-sub">across all reviewers</div></div>
+  </div>
+
+  <div class="section-row">
+    <div class="card">
+      <div class="card-title">Detection breakdown</div>
+      <canvas id="donutChart" role="img" aria-label="Pie chart showing 42% fake, 25% suspicious, 33% genuine reviews">Fake: 5, Suspicious: 3, Genuine: 4</canvas>
+      <div style="margin-top:12px">
+        <div class="legend-item"><div class="legend-dot" style="background:#E24B4A"></div>Fake (5 reviews)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#BA7517"></div>Suspicious (3 reviews)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#639922"></div>Genuine (4 reviews)</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Fake signals frequency</div>
+      <div id="signalBars" style="padding-top:4px"></div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <span style="font-size:12px;color:var(--color-text-secondary)">Filter:</span>
+    <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="setFilter('fake',this)">Fake</button>
+    <button class="filter-btn" onclick="setFilter('suspicious',this)">Suspicious</button>
+    <button class="filter-btn" onclick="setFilter('genuine',this)">Genuine</button>
+  </div>
+
+  <div class="reviews-list" id="reviewsList"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const reviews = [
+  {id:1,product:'headphones',reviewer:'JohnD99',initials:'JD',avatarColor:'#B5D4F4',avatarText:'#185FA5',stars:5,date:'Apr 22, 2026',text:'AMAZING product!! Best headphones I ever bought!! Will buy again and again!! Sound quality is PERFECT!! Everyone should buy this NOW!!',status:'fake',sentiment:{positive:92,negative:5,neutral:3},credibility:12,signals:['All caps overuse','Excessive exclamation','No specific details','New account (2 days)','Verified purchase: No'],aiResult:null},
+  {id:2,product:'headphones',reviewer:'AudioFan_Lisa',initials:'AL',avatarColor:'#9FE1CB',avatarText:'#0F6E56',stars:4,date:'Apr 20, 2026',text:'Good sound quality overall. The bass is decent but highs can get a bit harsh at loud volumes. Comfortable fit for long sessions. Battery lasted about 18 hours which is close to advertised. Would recommend for the price point.',status:'genuine',sentiment:{positive:68,negative:18,neutral:14},credibility:88,signals:['Specific details','Balanced feedback','Verified purchase','Active reviewer (47 reviews)'],aiResult:null},
+  {id:3,product:'blender',reviewer:'HealthyMom2026',initials:'HM',avatarColor:'#F5C4B3',avatarText:'#993C1D',stars:5,date:'Apr 21, 2026',text:'This blender changed my life! I make smoothies every morning and it is the best thing ever! Perfect for everything! My whole family loves it! Buy it!',status:'fake',sentiment:{positive:95,negative:0,neutral:5},credibility:21,signals:['Vague claims','No specific use case','New account (1 day)','Repeated in 6 products','Verified purchase: No'],aiResult:null},
+  {id:4,product:'blender',reviewer:'ChefMarcus',initials:'CM',avatarColor:'#CECBF6',avatarText:'#3C3489',stars:3,date:'Apr 18, 2026',text:'Mixed feelings on this blender. The motor is powerful and handles ice well. However, the lid leaks slightly if overfilled and the noise level is quite high. Cleaning is easy with the self-clean function. Good value but not perfect.',status:'genuine',sentiment:{positive:45,negative:35,neutral:20},credibility:82,signals:['Specific features noted','Balanced pros/cons','Verified purchase','Established account'],aiResult:null},
+  {id:5,product:'watch',reviewer:'TechReview_X',initials:'TX',avatarColor:'#FAC775',avatarText:'#854F0B',stars:5,date:'Apr 23, 2026',text:'Excellent smart watch. Five stars. Great product from great company. I recommend this to all my friends. Very happy with purchase. Good quality.',status:'suspicious',sentiment:{positive:85,negative:5,neutral:10},credibility:38,signals:['Generic phrases','Short review','Similar to 3 other reviews','Account: 8 days old'],aiResult:null},
+  {id:6,product:'watch',reviewer:'GadgetGuru_Priya',initials:'GP',avatarColor:'#C0DD97',avatarText:'#3B6D11',stars:2,date:'Apr 17, 2026',text:"Disappointed. The step counter is off by about 15-20% compared to my fitness band. Sleep tracking rarely works. Battery does last 5 days as advertised. The interface is clunky — took me a while to figure out notifications. Returning it.",status:'genuine',sentiment:{positive:22,negative:62,neutral:16},credibility:91,signals:['Specific metrics cited','Critical & detailed','Long-term user (112 reviews)','Verified purchase'],aiResult:null},
+  {id:7,product:'headphones',reviewer:'Review_Bot_441',initials:'RB',avatarColor:'#F7C1C1',avatarText:'#791F1F',stars:5,date:'Apr 24, 2026',text:'5 stars. Best product. Highly recommend. Quality product. Fast shipping. Happy customer. Will order again. Top seller item.',status:'fake',sentiment:{positive:88,negative:0,neutral:12},credibility:5,signals:['Bot-like pattern','8 word sentences','Posted 12 reviews today','No account history','Verified purchase: No'],aiResult:null},
+  {id:8,product:'blender',reviewer:'KitchenExpert_Ravi',initials:'KR',avatarColor:'#B5D4F4',avatarText:'#185FA5',stars:4,date:'Apr 16, 2026',text:"I've tested blenders across all price ranges. This NutriBlast Pro sits comfortably mid-tier. Handles leafy greens well, smoothies come out silky. The 1200W motor is adequate. One gripe — the jar isn't dishwasher safe which feels like an oversight. Overall solid buy for home use.",status:'genuine',sentiment:{positive:62,negative:20,neutral:18},credibility:94,signals:['Expert context given','Comparative knowledge','Veteran reviewer (203 reviews)','Verified purchase'],aiResult:null},
+  {id:9,product:'watch',reviewer:'BuyNow_Deals',initials:'BD',avatarColor:'#FAC775',avatarText:'#854F0B',stars:5,date:'Apr 24, 2026',text:'Best smartwatch on the market. I love it so much. Perfect gift for everyone. Buy for your family today. Great deal. Amazing value. Superb product.',status:'fake',sentiment:{positive:96,negative:0,neutral:4},credibility:8,signals:['Promotional tone','Gift suggestion push','Account matches seller','0 other reviews','Verified purchase: No'],aiResult:null},
+  {id:10,product:'headphones',reviewer:'MusicLover_Sana',initials:'MS',avatarColor:'#9FE1CB',avatarText:'#0F6E56',stars:3,date:'Apr 14, 2026',text:"Average headphones for the price. Noise cancellation works in quiet environments but fails in busy cafes. The mic quality is poor for calls. The earcups are comfortable. Build feels slightly plasticky. Not bad but I've used better in this range.",status:'suspicious',sentiment:{positive:35,negative:42,neutral:23},credibility:55,signals:['Inconsistent detail level','New account (14 days)','2 similar reviews found'],aiResult:null},
+  {id:11,product:'blender',reviewer:'FakeUser_X99',initials:'FX',avatarColor:'#F7C1C1',avatarText:'#791F1F',stars:5,date:'Apr 25, 2026',text:'WOW WOW WOW!! This blender is INCREDIBLE!! I cannot believe how amazing it is!! BEST PURCHASE EVER!! HIGHLY RECOMMEND TO EVERYONE!! DO NOT MISS THIS!!',status:'fake',sentiment:{positive:98,negative:0,neutral:2},credibility:3,signals:['All caps','Extreme enthusiasm','Account created today','0 purchase history','Verified purchase: No'],aiResult:null},
+  {id:12,product:'watch',reviewer:'TechDaily_Arjun',initials:'TA',avatarColor:'#CECBF6',avatarText:'#3C3489',stars:4,date:'Apr 19, 2026',text:"Solid budget smartwatch. HR monitor is accurate within 3-4 BPM of my chest strap. GPS locks fast outdoors. The screen is readable in sunlight. App needs work — syncing sometimes drops. For Rs. 4,999 it punches above its weight. Good pick if you don't need premium features.",status:'suspicious',sentiment:{positive:65,negative:20,neutral:15},credibility:62,signals:['Reasonable detail','Slightly promotional close','Account: 22 days old'],aiResult:null}
+];
+
+let currentFilter = 'all';
+let currentProduct = 'all';
+
+const signals_freq = [
+  {label:'No specifics',count:7,color:'#E24B4A'},
+  {label:'New account',count:6,color:'#E24B4A'},
+  {label:'Unverified',count:5,color:'#BA7517'},
+  {label:'Excl./Caps',count:4,color:'#E24B4A'},
+  {label:'Generic text',count:4,color:'#BA7517'},
+  {label:'Bot pattern',count:2,color:'#A32D2D'},
+];
+
+function renderSignalBars(){
+  const max=7;
+  document.getElementById('signalBars').innerHTML=signals_freq.map(s=>`
+    <div class="bar-row">
+      <div class="bar-label">${s.label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(s.count/max*100)}%;background:${s.color}"></div></div>
+      <div class="bar-val">${s.count}</div>
+    </div>`).join('');
+}
+
+function renderDonut(){
+  const ctx=document.getElementById('donutChart').getContext('2d');
+  new Chart(ctx,{type:'doughnut',data:{labels:['Fake','Suspicious','Genuine'],datasets:[{data:[5,3,4],backgroundColor:['#E24B4A','#BA7517','#639922'],borderWidth:2,borderColor:'transparent'}]},options:{responsive:true,maintainAspectRatio:true,cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:d=>`${d.label}: ${d.raw} reviews`}}}}});
+}
+
+function setFilter(f,btn){
+  currentFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderReviews();
+}
+
+function filterReviews(){
+  currentProduct=document.getElementById('productFilter').value;
+  renderReviews();
+  updateMetrics();
+}
+
+function updateMetrics(){
+  const filtered=reviews.filter(r=>currentProduct==='all'||r.product===currentProduct);
+  const fake=filtered.filter(r=>r.status==='fake').length;
+  const susp=filtered.filter(r=>r.status==='suspicious').length;
+  const avgCred=Math.round(filtered.reduce((a,r)=>a+r.credibility,0)/filtered.length);
+  document.getElementById('m-total').textContent=filtered.length;
+  document.getElementById('m-fake').textContent=fake;
+  document.getElementById('m-fake-pct').textContent=Math.round(fake/filtered.length*100)+'% of total';
+  document.getElementById('m-susp').textContent=susp;
+  document.getElementById('m-cred').textContent=avgCred+'%';
+  document.getElementById('m-cred').className='metric-value '+(avgCred>=70?'green':avgCred>=40?'amber':'red');
+}
+
+function getSentimentColor(s){return s==='positive'?'#639922':s==='negative'?'#E24B4A':'#888780'}
+
+function renderReviews(){
+  const list=reviews.filter(r=>{
+    const matchStatus=currentFilter==='all'||r.status===currentFilter;
+    const matchProduct=currentProduct==='all'||r.product===currentProduct;
+    return matchStatus&&matchProduct;
+  });
+  const products={headphones:'Wireless Headphones X9',blender:'NutriBlast Pro',watch:'SmartWatch Lite 2'};
+  document.getElementById('reviewsList').innerHTML=list.map(r=>`
+    <div class="review-card ${r.status}" id="card-${r.id}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div class="review-header" style="flex:1">
+          <div class="avatar" style="background:${r.avatarColor};color:${r.avatarText}">${r.initials}</div>
+          <div class="review-meta">
+            <div class="reviewer-name">${r.reviewer}</div>
+            <div class="review-date">${r.date} &middot; ${products[r.product]}</div>
+          </div>
+        </div>
+        <span class="badge badge-${r.status}">${r.status==='fake'?'Fake':r.status==='suspicious'?'Suspicious':'Genuine'}</span>
+      </div>
+      <div class="stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+      <div class="review-text">"${r.text}"</div>
+      <div class="signals">${r.signals.map(s=>{
+        const cls=s.includes('No ')||s.includes('Bot')||s.includes('All caps')||s.includes('Excl')||s.includes('0 ')||s.includes('today')||s.includes('Promo')||s.includes('Fake')||s.includes('seller')?'red':s.includes('New')||s.includes('day')||s.includes('similar')||s.includes('Generic')||s.includes('Short')||s.includes('Inconsistent')?'amber':'green';
+        return `<span class="signal ${cls}">${s}</span>`;
+      }).join('')}</div>
+      <div class="score-row">
+        <div class="score-item">
+          <div class="score-label">Credibility</div>
+          <div class="score-val" style="color:${r.credibility>=70?'#639922':r.credibility>=35?'#BA7517':'#E24B4A'}">${r.credibility}%</div>
+        </div>
+        <div class="score-item">
+          <div class="score-label">Sentiment</div>
+          <div class="score-val" style="color:${r.sentiment.positive>r.sentiment.negative?'#639922':'#E24B4A'}">${r.sentiment.positive>r.sentiment.negative?'Positive':'Negative'}</div>
+        </div>
+        <div class="score-item">
+          <div class="score-label">Positive</div>
+          <div class="score-val" style="color:#639922">${r.sentiment.positive}%</div>
+        </div>
+        <div class="score-item">
+          <div class="score-label">Negative</div>
+          <div class="score-val" style="color:#E24B4A">${r.sentiment.negative}%</div>
+        </div>
+      </div>
+      ${r.aiResult?`<div class="ai-result">${r.aiResult}</div>`:''}
+      <button class="analyze-btn" id="btn-${r.id}" onclick="analyzeReview(${r.id})">Analyze with AI ↗</button>
+    </div>
+  `).join('');
+}
+
+async function analyzeReview(id){
+  const r=reviews.find(x=>x.id===id);
+  const btn=document.getElementById(`btn-${id}`);
+  btn.disabled=true;btn.textContent='Analyzing...';
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'You are a review authenticity expert. Analyze the given product review for signs of fakeness. Be concise (3-4 sentences max). Focus on: linguistic patterns, specificity level, emotional authenticity, and credibility signals. End with a verdict: Likely Fake / Suspicious / Likely Genuine with confidence %.',messages:[{role:'user',content:`Product: ${r.product}\nReviewer: ${r.reviewer} (credibility score: ${r.credibility}%)\nStars: ${r.stars}/5\nReview: "${r.text}"\nSignals detected: ${r.signals.join(', ')}\n\nAnalyze this review.`}]})});
+    const data=await resp.json();
+    const text=data.content.map(c=>c.text||'').join('');
+    r.aiResult=text;
+    renderReviews();
+  }catch(e){
+    btn.disabled=false;btn.textContent='Analyze with AI ↗';
+  }
+}
+
+renderDonut();
+renderSignalBars();
+renderReviews();
+</script>
